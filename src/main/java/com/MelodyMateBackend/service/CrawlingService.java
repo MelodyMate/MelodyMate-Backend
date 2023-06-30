@@ -22,25 +22,27 @@ import java.util.*;
 public class CrawlingService {
 
     private SongMapper dao;
+    private CrawlingUrl dataUrl;
 
     @Autowired
-    public CrawlingService(SongMapper dao) {
+    public CrawlingService(SongMapper dao, CrawlingUrl dataUrl) {
         this.dao = dao;
+        this.dataUrl = dataUrl;
     }
 
     @Scheduled(fixedDelay = 3600000)
     public void dataCrawling() throws InterruptedException {
-        // WebDriver 경로 설정
+        // WebDriver 경로 설정 (###경로 변경 필요)
         System.setProperty("webdriver.chrome.driver", "D:\\backup\\Development\\2. Toy\\chromedriver\\chromedriver.exe");
 
         // WebDriver 옵션 설정, 객체 생성
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
-//        options.addArguments("headless");     // 크롬창 비활성화 옵션
+//        options.addArguments("headless");     // 크롬창 비활성화 진행
         WebDriver driver = new ChromeDriver(options);
 
         // 웹페이지 요청
-        String url = "https://www.kpop-radar.com/?type=1&date=4&gender=1#";
+        String url = dataUrl.getUrl();
         WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.get(url);
 
@@ -52,6 +54,7 @@ public class CrawlingService {
 
         crawling(driver, webDriverWait);
 
+        // TODO: 기존 데이터 삭제 추가 예정
 
 
     }
