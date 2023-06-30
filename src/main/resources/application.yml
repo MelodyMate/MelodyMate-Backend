@@ -3,21 +3,22 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/test
+    url: jdbc:h2:tcp://localhost/~/test;MODE=Oracle
     driverClassName: org.h2.Driver
     username: sa
-
-  jpa:
-    hibernate:
-      ddlAuto: create
-      showSql: true
-      formatSql: true
-    openInView: false
 
   h2:
     console:
       enabled: true
 
+mybatis:
+  mapper-locations: mybatis-mapper/*.xml
+  config-locations: mybatis-config/*.xml
+  typeAliasesPackage: com.MelodyMateBackend.domain
+  configuration:
+    map-underscore-to-camel-case: true
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
