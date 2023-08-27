@@ -20,12 +20,7 @@ public class HomeController {
     private final SongService songService;
     private final CrawlingService crawlingService;
 
-    @GetMapping("/chart-test")
-    public ResponseEntity<List<Song>> Home() throws InterruptedException {
-        System.out.println("dddd");
-        return new ResponseEntity<>(songService.getAllSong(), HttpStatus.OK);
-    }
-
+    // chart API 전달
     @GetMapping("/chart")
     public ResponseEntity<List<Song>> save() throws InterruptedException {
 
