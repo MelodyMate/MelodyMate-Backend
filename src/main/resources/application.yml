@@ -1,9 +1,9 @@
 server:
-  port: 8099
+  port: 8088
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/test;MODE=Oracle
+    url: jdbc:h2:tcp://localhost/~/melodymate;MODE=MySQL
     driverClassName: org.h2.Driver
     username: sa
 
@@ -11,12 +11,16 @@ spring:
     console:
       enabled: true
 
-mybatis:
-  mapper-locations: mybatis-mapper/*.xml
-  config-locations: mybatis-config/*.xml
-  typeAliasesPackage: com.MelodyMateBackend.domain
-  configuration:
-    map-underscore-to-camel-case: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+
 
 logging:
   level:
