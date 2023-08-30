@@ -11,7 +11,7 @@ import lombok.Setter;
 public class Songlist {
     @Id
     @Column(name = "ID", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "SONGSEQUENCE", nullable = false)
     private Boolean songsequence = false;

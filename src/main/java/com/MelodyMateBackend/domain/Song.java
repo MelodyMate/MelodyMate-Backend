@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class Song {
     @Id
     @Column(name = "ID", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "RANK", nullable = false)
     private Boolean rank = false;
