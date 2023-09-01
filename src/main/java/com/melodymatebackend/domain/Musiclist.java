@@ -1,5 +1,6 @@
-package com.MelodyMateBackend.domain;
+package com.melodymatebackend.domain;
 
+import com.melodymatebackend.music.domain.Music;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,18 +8,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "SONGLIST")
-public class Songlist {
+@Table(name = "MUSICLIST")
+public class Musiclist {
     @Id
     @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Column(name = "SONGSEQUENCE", nullable = false)
+    @Column(name = "MUSIC_SEQUENCE", nullable = false)
     private Boolean songsequence = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "SONGS_ID", nullable = false)
-    private Song songs;
+    @JoinColumn(name = "MUSIC_ID", nullable = false)
+    private Music music;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "PLAYLIST_ID", nullable = false)

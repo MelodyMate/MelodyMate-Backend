@@ -1,4 +1,4 @@
-package com.MelodyMateBackend.domain;
+package com.melodymatebackend.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

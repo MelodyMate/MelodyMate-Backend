@@ -1,4 +1,4 @@
-package com.MelodyMateBackend;
+package com.melodymatebackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

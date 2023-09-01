@@ -1,6 +1,6 @@
-package com.MelodyMateBackend.repository;
+package com.melodymatebackend.repository;
 
-import com.MelodyMateBackend.domain.Playlist;
+import com.melodymatebackend.domain.Playlist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
