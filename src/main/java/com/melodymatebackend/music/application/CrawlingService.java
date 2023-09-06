@@ -1,6 +1,5 @@
 package com.melodymatebackend.music.application;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.melodymatebackend.music.application.dto.MusicDTO;
 import com.melodymatebackend.music.domain.Music;
 import com.melodymatebackend.music.domain.MusicRepository;
@@ -11,6 +10,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,38 +27,45 @@ import java.util.List;
 @Service
 public class CrawlingService {
     private final MusicRepository musicRepository;
-    private final WebDriver driver = new ChromeDriver();
-    private final WebDriver durationDriver = new ChromeDriver();
-    private final WebDriverWait wait = new WebDriverWait(durationDriver, Duration.ofSeconds(15));
 
-
-    @Scheduled(fixedDelay = 86400000)
+    @Transactional(readOnly = false)
+    @Scheduled(cron = "0 0 3 * * ?")
     public void crawlingMain() throws InterruptedException {
-        driver.get("https://www.kpop-radar.com/?type=1&date=2&gender=1");
-        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
 
-        dataCrawling();
+
+        WebDriver durationDriver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver(options);
+        driver.get("https://www.kpop-radar.com/?type=1&date=2&gender=1");
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver/chromedriver");
+
+        dataCrawling(driver, js, durationDriver);
 
         WebElement pageButton = driver.findElement(By.cssSelector("#paging > a:nth-child(2)"));
         pageButton.click();
 
-        dataCrawling();
+        dataCrawling(driver, js, durationDriver);
 
         log.info("끝");
+        driver.quit();
+        durationDriver.quit();
 
     }
 
-    @Transactional(readOnly = false)
-    public void dataCrawling() {
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
+    @Transactional(readOnly = false)
+    public void dataCrawling(WebDriver driver, JavascriptExecutor js, WebDriver durationDriver) {
         try {
             WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(15));
             mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
 
             // 추출
             List<WebElement> boardItems = driver.findElements(By.className("board_item"));
-
             // 1-50위 저장
             for (WebElement boardItem : boardItems) {
                 try {
@@ -98,26 +105,26 @@ public class CrawlingService {
                     String thumbnail = thumbnailElement.getAttribute("src");
 
                     log.info("재생시간 추출");
-
                     // 재생시간 추출
-                    durationDriver.get(dataUrl);
-                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
-                    String duration = durationElement.getText();
+//                    durationDriver.get(dataUrl);
+//                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
+//                    String duration = durationElement.getText();
 
 
-                    musicDTO.setRank(ranking);
+                    musicDTO.setRanking(ranking);
                     musicDTO.setUrl(dataUrl);
                     musicDTO.setMusicTitle(title);
                     musicDTO.setArtist(artist);
                     musicDTO.setThumbnail(thumbnail);
-                    musicDTO.setDuration(duration);
+//                    musicDTO.setDuration(duration);
+                    musicDTO.setDuration("00:00");
                     musicDTO.setViewCount(views);
                     musicDTO.setReleaseDate(releaseDate);
                     musicDTO.setRankDate(LocalDate.now());
 
                     Music music = musicDTO.toEntity();
 
-                    log.info(ranking + " " + artist + " " + title);
+                    log.info(ranking + " " + artist + " " + title + " " + views + " " + releaseDate);
                     musicRepository.save(music);
 
                 } catch (Exception e) {

@@ -17,8 +17,8 @@ public class Music {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "RANK", nullable = false)
-    private String rank;
+    @Column(name = "RANKING", nullable = false)
+    private String ranking;
 
     @Column(name = "URL", nullable = true, length = 500)
     private String url;

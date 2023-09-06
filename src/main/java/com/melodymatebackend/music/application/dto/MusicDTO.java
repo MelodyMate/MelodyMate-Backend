@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class MusicDTO {
-    private String rank;
+    private String ranking;
 
     private String url;
 
@@ -29,7 +29,7 @@ public class MusicDTO {
 
     public Music toEntity() {
         return Music.builder()
-                .rank(rank)
+                .ranking(ranking)
                 .url(url)
                 .musicTitle(musicTitle)
                 .artist(artist)

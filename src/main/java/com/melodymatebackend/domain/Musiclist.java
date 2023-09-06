@@ -12,6 +12,7 @@ import lombok.Setter;
 public class Musiclist {
     @Id
     @Column(name = "ID", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "MUSIC_SEQUENCE", nullable = false)
