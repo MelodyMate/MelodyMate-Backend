@@ -22,12 +22,14 @@ public class MusicController {
 
     // chart API 전달
     @GetMapping("/chart")
-    public ResponseEntity<Map<String, Object>> save() {
-        LocalDate rankDate = LocalDate.now();
-        List<Music> music = musicService.musicList(rankDate);
+    public ResponseEntity<Map<String, Object>> save(LocalDate rankdate) {
+
+        if(rankdate == null){
+            rankdate = LocalDate.now();
+        }
+
+        List<Music> music = musicService.musicList(rankdate);
         Map<String, Object> musicList = new LinkedHashMap<>();
-
-
 
         musicList.put("count", music.size());
         musicList.put("data", music);
