@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,12 +31,11 @@ public class CrawlingService {
 
     @Transactional(readOnly = false)
     @Scheduled(cron = "0 0 3 * * ?")
+//    @Scheduled(fixedDelay = 360000)
     public void crawlingMain() throws InterruptedException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-
+        options.addArguments("window-size=1920x1080");
 
         WebDriver durationDriver = new ChromeDriver(options);
         WebDriver driver = new ChromeDriver(options);
@@ -44,6 +44,7 @@ public class CrawlingService {
 
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver/chromedriver");
 
+        System.out.println();
         dataCrawling(driver, js, durationDriver);
 
         WebElement pageButton = driver.findElement(By.cssSelector("#paging > a:nth-child(2)"));
@@ -66,7 +67,7 @@ public class CrawlingService {
 
             // 추출
             List<WebElement> boardItems = driver.findElements(By.className("board_item"));
-            // 1-50위 저장
+
             for (WebElement boardItem : boardItems) {
                 try {
                     MusicDTO musicDTO = new MusicDTO();
@@ -95,20 +96,20 @@ public class CrawlingService {
                     // 조회수 추출
                     WebElement viewsElement = boardItem.findElement(By.cssSelector(".views span"));
                     String views = viewsElement.getText();
+                    log.info(boardItem.findElement(By.cssSelector(".views > span")).getText());
 
                     // 릴리즈 날짜 추출
                     WebElement releaseElement = boardItem.findElement(By.cssSelector(".release span"));
                     String releaseDate = releaseElement.getText();
-
                     // 썸네일 추출
                     WebElement thumbnailElement = boardItem.findElement(By.cssSelector(".board_item .cf4a img:nth-of-type(4)"));
                     String thumbnail = thumbnailElement.getAttribute("src");
 
                     log.info("재생시간 추출");
                     // 재생시간 추출
-//                    durationDriver.get(dataUrl);
-//                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
-//                    String duration = durationElement.getText();
+                    durationDriver.get(dataUrl);
+                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
+                    String duration = durationElement.getText();
 
 
                     musicDTO.setRanking(ranking);
@@ -116,15 +117,14 @@ public class CrawlingService {
                     musicDTO.setMusicTitle(title);
                     musicDTO.setArtist(artist);
                     musicDTO.setThumbnail(thumbnail);
-//                    musicDTO.setDuration(duration);
-                    musicDTO.setDuration("00:00");
+                    musicDTO.setDuration(duration);
                     musicDTO.setViewCount(views);
                     musicDTO.setReleaseDate(releaseDate);
                     musicDTO.setRankDate(LocalDate.now());
 
                     Music music = musicDTO.toEntity();
 
-                    log.info(ranking + " " + artist + " " + title + " " + views + " " + releaseDate);
+                    log.info(ranking + " / " + artist + " / " + title + " / " + views + " / " + releaseDate);
                     musicRepository.save(music);
 
                 } catch (Exception e) {
