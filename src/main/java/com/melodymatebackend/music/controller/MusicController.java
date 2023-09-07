@@ -27,6 +27,8 @@ public class MusicController {
         List<Music> music = musicService.musicList(rankDate);
         Map<String, Object> musicList = new LinkedHashMap<>();
 
+
+
         musicList.put("count", music.size());
         musicList.put("data", music);
         return ResponseEntity.ok().body(musicList);

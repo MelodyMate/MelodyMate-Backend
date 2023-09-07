@@ -33,34 +33,38 @@ public class CrawlingService {
     @Scheduled(cron = "0 0 3 * * ?")
 //    @Scheduled(fixedDelay = 360000)
     public void crawlingMain() throws InterruptedException {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments("window-size=1920x1080");
+        WebDriver driver = getWebDriver();
 
-        WebDriver durationDriver = new ChromeDriver(options);
-        WebDriver driver = new ChromeDriver(options);
-        driver.get("https://www.kpop-radar.com/?type=1&date=2&gender=1");
         JavascriptExecutor js = (JavascriptExecutor) driver;
-
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver/chromedriver");
-
-        System.out.println();
-        dataCrawling(driver, js, durationDriver);
-
+        dataCrawling(driver, js);
         WebElement pageButton = driver.findElement(By.cssSelector("#paging > a:nth-child(2)"));
         pageButton.click();
 
-        dataCrawling(driver, js, durationDriver);
+        dataCrawling(driver, js);
 
         log.info("끝");
         driver.quit();
-        durationDriver.quit();
 
+    }
+
+    private static WebDriver getWebDriver() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("window-size=1920x1080");
+        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
+
+
+        WebDriver driver = new ChromeDriver(options);
+        driver.get("https://www.kpop-radar.com/?type=1&date=2&gender=1");
+        return driver;
     }
 
 
     @Transactional(readOnly = false)
-    public void dataCrawling(WebDriver driver, JavascriptExecutor js, WebDriver durationDriver) {
+    public void dataCrawling(WebDriver driver, JavascriptExecutor js) {
         try {
             WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(15));
             mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
@@ -96,7 +100,6 @@ public class CrawlingService {
                     // 조회수 추출
                     WebElement viewsElement = boardItem.findElement(By.cssSelector(".views span"));
                     String views = viewsElement.getText();
-                    log.info(boardItem.findElement(By.cssSelector(".views > span")).getText());
 
                     // 릴리즈 날짜 추출
                     WebElement releaseElement = boardItem.findElement(By.cssSelector(".release span"));
@@ -105,12 +108,27 @@ public class CrawlingService {
                     WebElement thumbnailElement = boardItem.findElement(By.cssSelector(".board_item .cf4a img:nth-of-type(4)"));
                     String thumbnail = thumbnailElement.getAttribute("src");
 
-                    log.info("재생시간 추출");
                     // 재생시간 추출
-                    durationDriver.get(dataUrl);
-                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
-                    String duration = durationElement.getText();
+//                    durationDriver.get(dataUrl);
+//                    WebElement durationElement = durationDriver.findElement(By.cssSelector("span.ytp-time-duration"));
+//                    String duration = durationElement.getText();
 
+                    log.info("재생시간 추출");
+
+                    WebElement ytbButton = boardItem.findElement(By.cssSelector("div.board_item > div.title > a"));
+                    ytbButton.click();
+
+                    // iframe 전환
+                    driver.switchTo().frame(driver.findElement(By.cssSelector("#youtubeVideo > iframe")));
+                    Thread.sleep(300);
+
+                    // 유튜브 재생 버튼 클릭
+                    WebElement startButton = driver.findElement(By.cssSelector("#movie_player > div.ytp-cued-thumbnail-overlay > button"));
+                    startButton.click();
+                    Thread.sleep(300);
+
+                    // 저장 데이터 선언
+                    String duration = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration")).getText();
 
                     musicDTO.setRanking(ranking);
                     musicDTO.setUrl(dataUrl);
@@ -118,6 +136,7 @@ public class CrawlingService {
                     musicDTO.setArtist(artist);
                     musicDTO.setThumbnail(thumbnail);
                     musicDTO.setDuration(duration);
+//                    musicDTO.setDuration("00:00");
                     musicDTO.setViewCount(views);
                     musicDTO.setReleaseDate(releaseDate);
                     musicDTO.setRankDate(LocalDate.now());
@@ -125,6 +144,13 @@ public class CrawlingService {
                     Music music = musicDTO.toEntity();
 
                     log.info(ranking + " / " + artist + " / " + title + " / " + views + " / " + releaseDate);
+
+                    driver.switchTo().defaultContent();
+                    WebElement closeButton = driver.findElement(By.cssSelector("#youtubeModal > a"));
+                    closeButton.click();
+                    Thread.sleep(300);
+
+
                     musicRepository.save(music);
 
                 } catch (Exception e) {
