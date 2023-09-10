@@ -18,7 +18,7 @@ public class Music {
     private Long id;
 
     @Column(name = "RANKING", nullable = false)
-    private String ranking;
+    private int ranking;
 
     @Column(name = "URL", nullable = true, length = 500)
     private String url;

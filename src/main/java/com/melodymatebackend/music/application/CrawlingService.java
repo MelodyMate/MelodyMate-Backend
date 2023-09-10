@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Iterator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,7 +29,7 @@ public class CrawlingService {
     private final MusicRepository musicRepository;
 
     @Transactional(readOnly = false)
-    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0 5 0 * * ?")
 //    @Scheduled(fixedDelay = 360000)
     public void crawlingMain() throws InterruptedException {
         WebDriver driver = getWebDriver();
@@ -55,7 +54,6 @@ public class CrawlingService {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("window-size=1920x1080");
         options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
-
 
         WebDriver driver = new ChromeDriver(options);
         driver.get("https://www.kpop-radar.com/?type=1&date=2&gender=1");
@@ -130,7 +128,7 @@ public class CrawlingService {
                     // 저장 데이터 선언
                     String duration = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration")).getText();
 
-                    musicDTO.setRanking(ranking);
+                    musicDTO.setRanking(Integer.parseInt(ranking));
                     musicDTO.setUrl(dataUrl);
                     musicDTO.setMusicTitle(title);
                     musicDTO.setArtist(artist);

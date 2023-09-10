@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class MusicDTO {
-    private String ranking;
+    private int ranking;
 
     private String url;
 
