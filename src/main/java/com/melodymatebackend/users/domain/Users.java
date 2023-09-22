@@ -1,14 +1,13 @@
-package com.melodymatebackend.domain;
+package com.melodymatebackend.users.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-@Entity
 @Table(name = "USERS")
-public class User {
+@Builder
+public class Users {
     @Id
     @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

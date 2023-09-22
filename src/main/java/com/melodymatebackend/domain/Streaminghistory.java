@@ -1,5 +1,6 @@
 package com.melodymatebackend.domain;
 
+import com.melodymatebackend.users.domain.Users;
 import com.melodymatebackend.music.domain.Music;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class Streaminghistory {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "USERS_ID", nullable = false)
-    private User users;
+    private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "MUSIC_ID", nullable = false)

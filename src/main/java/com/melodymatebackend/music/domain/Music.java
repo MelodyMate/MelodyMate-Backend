@@ -6,11 +6,8 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Table(name = "MUSIC")
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Getter
-@Entity
 public class Music {
     @Id
     @Column(name = "ID", nullable = false)
