@@ -1,5 +1,6 @@
 package com.melodymatebackend.domain;
 
+import com.melodymatebackend.users.domain.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class Playlist {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "USERS_ID", nullable = false)
-    private User users;
+    private Users users;
 
     @Column(name = "CREATEDATE", nullable = false)
     private Instant createdate;
