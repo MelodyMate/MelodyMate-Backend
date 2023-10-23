@@ -21,12 +21,7 @@ public class UsersController {
     public ResponseEntity<Map<String, Object>> join(UsersDTO usersDTO) {
 
 
-        return ResponseEntity.ok();
-    }
-
-    @GetMapping("/admin")
-    public void musicSave() throws InterruptedException {
-        crawlingService.crawlingMain();
+        return ResponseEntity.ok(null);
     }
 
 }

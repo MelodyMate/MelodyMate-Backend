@@ -1,20 +1,17 @@
 package com.melodymatebackend.music.domain;
 
-import com.melodymatebackend.music.domain.Music;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface MusicRepository extends JpaRepository<Music, Long> {
 
-    List<Music> findAllByRankDate(LocalDate rankDate);
+    Music findByArtistAndTitle(String artist, String title);
 
-    @Query("SELECT r FROM Music r WHERE r.rankDate = (SELECT MAX(d.rankDate) FROM Music d) ORDER BY r.ranking ASC")
-    List<Music> findLatestDataByRanking();
+    boolean existsByArtistAndTitle(String artist, String title);
+
+
 
 }

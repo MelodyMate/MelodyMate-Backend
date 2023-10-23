@@ -2,7 +2,6 @@ package com.melodymatebackend.music.application;
 
 import com.melodymatebackend.music.domain.Music;
 import com.melodymatebackend.music.domain.MusicRepository;
-import com.melodymatebackend.music.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,17 +20,17 @@ public class MusicService {
     private final MusicRepository musicRepository;
 
     public List<Music> musicList(LocalDate rankDate) {
-        return musicRepository.findAllByRankDate(rankDate);
+        return musicRepository.findAll();
     }
 
-    public List<Music> musicLatestData(LocalDate date){
-        List<Music> musicList = musicRepository.findAllByRankDate(date);
-
-        if(musicList.isEmpty()){
-            musicList = musicRepository.findLatestDataByRanking();
-        }
-
-        return musicList;
+    public boolean existsMusic(String artist, String title){
+        return musicRepository.existsByArtistAndTitle(artist, title);
     }
 
+    public Music findByArtistAndTitle(String artist, String title){
+        return musicRepository.findByArtistAndTitle(artist, title);
+    }
+
+
+    
 }

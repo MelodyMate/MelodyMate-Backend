@@ -1,6 +1,6 @@
 package com.melodymatebackend.users.application.dto;
 
-import com.melodymatebackend.users.domain.Users;
+import com.melodymatebackend.users.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +13,13 @@ public class UsersDTO {
 
     private String password;
 
-    private String name;
+    private String nickname;
 
-    public UsersDTO toEntity() {
-        return Users.builder()
-                .email(emaial)
+    public User toEntity() {
+        return User.builder()
+                .email(email)
                 .password(password)
-                .name(name)
+                .nickname(nickname)
                 .build();
     }
 }

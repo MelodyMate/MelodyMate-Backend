@@ -4,28 +4,26 @@ import com.melodymatebackend.users.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
 @Getter
 @Entity
-@Table(name = "PLAYLIST")
+@Table(name = "MIXTAPES")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Playlist {
+public class Mixtape {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "name", nullable = false, length = 200)
+    private String name;
+
+    @Column(name = "description", length = 400)
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "users_id", nullable = false)
     private User users;
-
-    @Column(name = "createDate", nullable = false)
-    private Instant createDate;
-
-    @Column(name = "updateDate")
-    private Instant updateDate;
 
 }
