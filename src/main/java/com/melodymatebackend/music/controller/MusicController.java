@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -29,7 +31,14 @@ public class MusicController {
             date = LocalDate.now();
         }
 
-        return ResponseEntity.ok(null);
+        List<Map<String, Object>> musicList = musicService.getMusicList(date);
+        Map<String, Object> musicData = new LinkedHashMap<>();
+
+        musicData.put("count", musicList.size());
+        musicData.put("data", musicList);
+
+        // TODO : 랭킹이 하나만 나옵니다...
+        return ResponseEntity.ok(musicData);
     }
 
     @GetMapping("/admin")

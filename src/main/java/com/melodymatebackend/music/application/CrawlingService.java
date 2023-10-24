@@ -41,6 +41,11 @@ public class CrawlingService {
     @Scheduled(cron = "0 5 0 * * ?")
 //    @Scheduled(fixedDelay = 360000)
     public void crawlingMain() throws InterruptedException {
+
+        // rankings 테이블에서 크롤링하는 날짜 지우기
+        LocalDate today = LocalDate.now();
+        rankingsRepository.deleteRankingByRankDate(today);
+
         String url = "https://www.kpop-radar.com/?type=1&date=2&gender=1";
 
         WebDriver driver = getWebDriver(url);
@@ -75,6 +80,7 @@ public class CrawlingService {
 
     @Transactional(readOnly = false)
     public void dataCrawling(WebDriver driver, JavascriptExecutor js) throws InterruptedException {
+
 
         int maxRetry = 3;
 
@@ -142,6 +148,8 @@ public class CrawlingService {
 //                    WebElement durationElement = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration"));
 //                    String duration = durationElement.getText();
 
+
+
                     musicDTO.setUrl(dataUrl);
                     musicDTO.setArtist(artist);
                     musicDTO.setTitle(title);
@@ -168,8 +176,8 @@ public class CrawlingService {
                             musicRepository.save(music);
                         } else {
                             music = musicRepository.findByArtistAndTitle(musicDTO.getArtist(), musicDTO.getTitle());
-
                         }
+
                         rankingDTO.setRank(ranking);
                         rankingDTO.setMusic(music);
                         rankingDTO.setRankDate(LocalDate.now());
