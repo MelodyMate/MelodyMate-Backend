@@ -2,12 +2,8 @@ package com.melodymatebackend.music.controller;
 
 import com.melodymatebackend.music.application.CrawlingService;
 import com.melodymatebackend.music.application.MusicService;
-import com.melodymatebackend.music.domain.Music;
-import com.melodymatebackend.music.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,11 +31,13 @@ public class MusicController {
             date = LocalDate.now();
         }
 
-        List<Music> musicList = musicService.musicLatestData(date);
+        List<Map<String, Object>> musicList = musicService.getMusicList(date);
         Map<String, Object> musicData = new LinkedHashMap<>();
+
         musicData.put("count", musicList.size());
         musicData.put("data", musicList);
 
+        // TODO : 랭킹이 하나만 나옵니다...
         return ResponseEntity.ok(musicData);
     }
 
