@@ -47,7 +47,7 @@ public class MusicService {
             rankingData.put("duration", ranking.getMusic().getDuration());
             rankingData.put("viewCount", ranking.getMusic().getViewCount());
             rankingData.put("releaseDate", ranking.getMusic().getReleaseDate());
-            rankingData.put("rankDate", ranking.getMusic().getReleaseDate());
+            rankingData.put("rankDate", ranking.getRankDate());
 
             result.add(rankingData);
         }

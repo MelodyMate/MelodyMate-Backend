@@ -12,6 +12,4 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
 
     boolean existsByArtistAndTitle(String artist, String title);
 
-
-
 }
