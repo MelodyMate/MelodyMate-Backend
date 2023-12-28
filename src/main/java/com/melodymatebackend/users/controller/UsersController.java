@@ -22,17 +22,22 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1.0")
 @Validated
+@RequestMapping("/api/v1.0")
 public class UsersController {
 
     private final UsersService usersService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UsersDTO usersDTO, BindingResult bindingResult) {
-
+    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UsersDTO usersDTO) {
         usersService.join(usersDTO);
-
         return new ResponseEntity<>(new ApiResponse(HttpStatus.CREATED.value(), HttpStatus.CREATED.name(), usersDTO), HttpStatus.CREATED);
     }
+
+    @PostMapping("/signin")
+    public ResponseEntity<ApiResponse> signin(@Valid @RequestBody UsersDTO usersDTO){
+//        usersService.login(usersDTO);
+        return new ResponseEntity<>(new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), usersDTO), HttpStatus.OK);
+    }
 }
+

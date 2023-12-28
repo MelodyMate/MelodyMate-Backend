@@ -4,9 +4,12 @@ import com.melodymatebackend.users.application.dto.UsersDTO;
 import com.melodymatebackend.users.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -32,4 +35,5 @@ public class UsersService {
 
         usersRepository.save(usersDTO.toEntity());
     }
+
 }
