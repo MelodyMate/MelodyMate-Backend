@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MusicController {
     }
 
     @GetMapping("/admin")
-    public void musicSave() throws InterruptedException {
+    public void musicSave() throws InterruptedException, IOException {
         crawlingService.crawlingMain();
     }
 

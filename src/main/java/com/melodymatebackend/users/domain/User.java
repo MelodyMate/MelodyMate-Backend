@@ -1,6 +1,7 @@
 package com.melodymatebackend.users.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
