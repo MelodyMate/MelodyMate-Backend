@@ -6,13 +6,6 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/melodymate-dev']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-token', url: 'https://github.com/MelodyMate/MelodyMate-Backend.git']])
             }
         }
-
-
-       stage('Finish') {
-            steps{
-                sh 'docker images -qf dangling=true | xargs -I{} docker rmi {}'
-            }
-        }
     }
 }
 
