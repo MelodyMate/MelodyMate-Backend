@@ -33,30 +33,18 @@ public class MusicService {
         return musicRepository.findByArtistAndTitle(artist, title);
     }
 
-    public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
-        List<Ranking> rankings = rankingsRepository.findByRankDate(rankDate);
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        for (Ranking ranking : rankings) {
-            Map<String, Object> rankingData = new HashMap<>();
-            rankingData.put("ranking", ranking.getRank());
-            rankingData.put("musicTitle", ranking.getMusic().getTitle());
-            rankingData.put("artist", ranking.getMusic().getArtist());
-            rankingData.put("url", ranking.getMusic().getUrl());
-            rankingData.put("thumbnail", ranking.getMusic().getThumbnail());
-            rankingData.put("duration", ranking.getMusic().getDuration());
-            rankingData.put("viewCount", ranking.getMusic().getViewCount());
-            rankingData.put("releaseDate", ranking.getMusic().getReleaseDate());
-            rankingData.put("rankDate", ranking.getRankDate());
-
-            result.add(rankingData);
-        }
+    public Map<String, Object> getMusicList(LocalDate rankDate) {
+        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("count", rankings.size());
+        result.put("data", rankings);
 
         return result;
     }
 
-    public void deleteRankingByRankDate(LocalDate rankDate){
+    public void deleteRankingByRankDate(LocalDate rankDate) {
         rankingsRepository.deleteRankingByRankDate(rankDate);
     }
+
 
 }
