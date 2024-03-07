@@ -6,6 +6,17 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/melodymate-dev']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-token', url: 'https://github.com/MelodyMate/MelodyMate-Backend.git']])
             }
         }
+
+        stage('Gradle Build') {
+            steps {
+                sh '''
+                    chmod 755 gradlew
+                    ./gradlew clean bootjar
+                    mv build/libs/*.jar ROOT.jar
+                    ls -al
+                '''
+            }
+        }
     }
 }
 

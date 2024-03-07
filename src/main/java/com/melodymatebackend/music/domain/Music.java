@@ -3,6 +3,7 @@ package com.melodymatebackend.music.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+@SequenceGenerator(name = "music_seq", sequenceName = "music_seq", initialValue = 1, allocationSize = 1)
 @Getter
 @Entity
 @Table(name = "MUSIC")
@@ -11,8 +12,8 @@ import lombok.*;
 @Builder
 public class Music {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "music_seq")
+    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @Column(name = "url", nullable = false, length = 500)

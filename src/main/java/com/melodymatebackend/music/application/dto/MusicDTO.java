@@ -15,6 +15,7 @@ public class MusicDTO {
     private String duration;
     private String viewCount;
     private String releaseDate;
+
     public Music toEntity() {
         return Music.builder()
                 .url(url)
@@ -26,4 +27,16 @@ public class MusicDTO {
                 .releaseDate(releaseDate)
                 .build();
     }
+
+    public Music updateViewCount(){
+        return Music.builder()
+                .viewCount(viewCount)
+                .build();
+    }
+
+    public boolean isValid() {
+        return !url.isEmpty() && !artist.isEmpty() && !title.isEmpty() && !thumbnail.isEmpty()
+                && !duration.isEmpty() && !viewCount.isEmpty() && !releaseDate.isEmpty();
+    }
+
 }

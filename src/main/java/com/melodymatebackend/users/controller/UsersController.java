@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,6 +29,11 @@ public class UsersController {
 
     private final UsersService usersService;
 
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> users() {
+        return ResponseEntity.ok(usersService.getUsers());
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UsersDTO usersDTO) {
         usersService.join(usersDTO);
@@ -35,8 +41,8 @@ public class UsersController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse> signin(@Valid @RequestBody UsersDTO usersDTO){
-//        usersService.login(usersDTO);
+    public ResponseEntity<ApiResponse> signin(@Valid @RequestBody UsersDTO usersDTO) {
+        usersService.login(usersDTO);
         return new ResponseEntity<>(new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), usersDTO), HttpStatus.OK);
     }
 }

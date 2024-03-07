@@ -1,6 +1,7 @@
 package com.melodymatebackend.users.application;
 
 import com.melodymatebackend.users.application.dto.UsersDTO;
+import com.melodymatebackend.users.domain.User;
 import com.melodymatebackend.users.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,5 +37,15 @@ public class UsersService {
 
         usersRepository.save(usersDTO.toEntity());
     }
+
+    public void login(UsersDTO usersDTO) {
+
+    }
+
+    public List<User> getUsers() {
+        return usersRepository.findAll();
+    }
+
+
 
 }

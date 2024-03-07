@@ -15,11 +15,11 @@ import java.time.Instant;
 public class Playlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "users_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private User users;
 
     @Column(name = "createDate", nullable = false)
