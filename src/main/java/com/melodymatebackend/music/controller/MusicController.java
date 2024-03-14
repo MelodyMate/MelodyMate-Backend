@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,12 +38,12 @@ public class MusicController {
         musicData.put("count", musicList.size());
         musicData.put("data", musicList);
 
-        // TODO : 랭킹이 하나만 나옵니다...
         return ResponseEntity.ok(musicData);
+
     }
 
     @GetMapping("/admin")
-    public void musicSave() throws InterruptedException {
+    public void musicSave() throws InterruptedException, IOException {
         crawlingService.crawlingMain();
     }
 

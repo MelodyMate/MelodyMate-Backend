@@ -1,5 +1,6 @@
 package com.melodymatebackend.music.application;
 
+import com.google.common.collect.ImmutableMap;
 import com.melodymatebackend.music.application.dto.MusicDTO;
 import com.melodymatebackend.music.application.dto.RankingDTO;
 import com.melodymatebackend.music.domain.Music;
@@ -20,10 +21,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -40,7 +41,7 @@ public class CrawlingService {
     @Transactional(readOnly = false)
     @Scheduled(cron = "0 5 0 * * ?")
 //    @Scheduled(fixedDelay = 360000)
-    public void crawlingMain() throws InterruptedException {
+    public void crawlingMain() throws IOException, InterruptedException {
 
         // rankings 테이블에서 크롤링하는 날짜 지우기
         LocalDate today = LocalDate.now();
@@ -49,7 +50,7 @@ public class CrawlingService {
         String url = "https://www.kpop-radar.com/?type=1&date=2&gender=1";
 
         WebDriver driver = getWebDriver(url);
-        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         dataCrawling(driver, js);
@@ -59,19 +60,20 @@ public class CrawlingService {
 
         dataCrawling(driver, js);
 
+        log.info("종료");
+        js.executeScript("window.close()");
+        driver.quit();
         log.info("끝");
 
-        Thread.sleep(2000);
-        driver.quit();
     }
 
     private static WebDriver getWebDriver(String url) {
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless");
-//        options.addArguments("--no-sandbox");
-//        options.addArguments("--disable-dev-shm-usage");
-//        options.addArguments("window-size=1920x1080");
-//        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("window-size=1920x1080");
+        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
 
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
@@ -80,8 +82,6 @@ public class CrawlingService {
 
     @Transactional(readOnly = false)
     public void dataCrawling(WebDriver driver, JavascriptExecutor js) throws InterruptedException {
-
-
         int maxRetry = 3;
 
         WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -148,8 +148,6 @@ public class CrawlingService {
 //                    WebElement durationElement = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration"));
 //                    String duration = durationElement.getText();
 
-
-
                     musicDTO.setUrl(dataUrl);
                     musicDTO.setArtist(artist);
                     musicDTO.setTitle(title);
@@ -158,35 +156,24 @@ public class CrawlingService {
                     musicDTO.setViewCount(views);
                     musicDTO.setReleaseDate(releaseDate);
 
-                    if (musicDTO.getUrl().isEmpty()
-                            || musicDTO.getArtist().isEmpty()
-                            || musicDTO.getThumbnail().isEmpty()
-                            || musicDTO.getDuration().isEmpty()
-                            || musicDTO.getViewCount().isEmpty()
-                            || musicDTO.getReleaseDate().isEmpty()
-                            || musicDTO.getTitle().isEmpty()) {
+                    if (!musicDTO.isValid()) {
                         retryCount++;
                         log.error("data is null");
-                    } else {
-                        Music music = musicDTO.toEntity();
-
-                        boolean checkSong = musicService.existsMusic(artist, title);
-
-                        if (!checkSong) {
-                            musicRepository.save(music);
-                        } else {
-                            music = musicRepository.findByArtistAndTitle(musicDTO.getArtist(), musicDTO.getTitle());
-                        }
-
-                        rankingDTO.setRank(ranking);
-                        rankingDTO.setMusic(music);
-                        rankingDTO.setRankDate(LocalDate.now());
-
-                        Ranking rankingDTOEntity = rankingDTO.toEntity();
-                        rankingsRepository.save(rankingDTOEntity);
-
-                        break;
+                        return;
                     }
+
+                    Music music = musicDTO.toEntity();
+
+                    musicRepository.save(music);
+
+                    rankingDTO.setRank(ranking);
+                    rankingDTO.setMusic(music);
+                    rankingDTO.setRankDate(LocalDate.now());
+
+                    Ranking rankingDTOEntity = rankingDTO.toEntity();
+                    rankingsRepository.save(rankingDTOEntity);
+
+                    break;
 
 
                 } catch (Exception e) {

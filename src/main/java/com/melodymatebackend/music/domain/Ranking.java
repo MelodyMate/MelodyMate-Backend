@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class Ranking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @Column(name = "rankDate", nullable = false)
@@ -24,7 +24,7 @@ public class Ranking {
     private String rank;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "music_id", nullable = false)
+    @JoinColumn(name = "music_id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Music music;
 
 }

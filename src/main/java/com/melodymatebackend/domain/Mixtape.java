@@ -13,7 +13,7 @@ import lombok.*;
 public class Mixtape {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @Column(name = "name", nullable = false, length = 200)
@@ -23,7 +23,7 @@ public class Mixtape {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "users_id", nullable = false)
+    @JoinColumn(name = "users_id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private User users;
 
 }

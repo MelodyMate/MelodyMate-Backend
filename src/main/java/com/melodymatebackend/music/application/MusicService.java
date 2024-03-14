@@ -34,7 +34,7 @@ public class MusicService {
     }
 
     public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
-        List<Ranking> rankings = rankingsRepository.findByRankDate(rankDate);
+        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Ranking ranking : rankings) {
@@ -48,15 +48,16 @@ public class MusicService {
             rankingData.put("viewCount", ranking.getMusic().getViewCount());
             rankingData.put("releaseDate", ranking.getMusic().getReleaseDate());
             rankingData.put("rankDate", ranking.getMusic().getReleaseDate());
-
             result.add(rankingData);
         }
 
         return result;
+
     }
 
-    public void deleteRankingByRankDate(LocalDate rankDate){
+    public void deleteRankingByRankDate(LocalDate rankDate) {
         rankingsRepository.deleteRankingByRankDate(rankDate);
     }
+
 
 }

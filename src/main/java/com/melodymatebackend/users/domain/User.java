@@ -1,6 +1,7 @@
 package com.melodymatebackend.users.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -13,7 +14,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @Column(name = "email", nullable = false, length = 50)
