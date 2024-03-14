@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -30,13 +32,14 @@ public class MusicController {
             date = LocalDate.now();
         }
 
-//        Map<String, Object> musicList = musicService.getMusicList(date);
-//        Map<String, Object> musicData = new LinkedHashMap<>();
+        List<Map<String, Object>> musicList = musicService.getMusicList(date);
+        Map<String, Object> musicData = new LinkedHashMap<>();
 
-//        musicData.put("count", musicList.size());
-//        musicData.put("data", musicList);
+        musicData.put("count", musicList.size());
+        musicData.put("data", musicList);
 
-        return ResponseEntity.ok(musicService.getMusicList(date));
+        return ResponseEntity.ok(musicData);
+
     }
 
     @GetMapping("/admin")
