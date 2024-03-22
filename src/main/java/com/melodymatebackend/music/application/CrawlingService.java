@@ -1,12 +1,8 @@
 package com.melodymatebackend.music.application;
 
-import com.google.common.collect.ImmutableMap;
-import com.melodymatebackend.music.application.dto.MusicDTO;
-import com.melodymatebackend.music.application.dto.RankingDTO;
-import com.melodymatebackend.music.domain.Music;
-import com.melodymatebackend.music.domain.MusicRepository;
-import com.melodymatebackend.music.domain.Ranking;
-import com.melodymatebackend.music.domain.RankingsRepository;
+import com.melodymatebackend.music.application.dto.MusicDto;
+import com.melodymatebackend.music.application.dto.RankingDto;
+import com.melodymatebackend.music.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -60,7 +56,6 @@ public class CrawlingService {
 
         dataCrawling(driver, js);
 
-        log.info("종료");
         js.executeScript("window.close()");
         driver.quit();
         log.info("끝");
@@ -69,12 +64,13 @@ public class CrawlingService {
 
     private static WebDriver getWebDriver(String url) {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
+        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
         options.addArguments("window-size=1920x1080");
-        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
-
+//        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
         return driver;
@@ -89,13 +85,14 @@ public class CrawlingService {
         // 추출
         List<WebElement> boardItems = driver.findElements(By.className("board_item"));
 
+        MusicDto musicDTO = new MusicDto();
+        RankingDto rankingDTO = new RankingDto();
+//        Music music = new Music();
+
         for (WebElement boardItem : boardItems) {
             int retryCount = 0;
             while (retryCount < maxRetry) {
-                log.info("count = " + retryCount);
                 try {
-                    MusicDTO musicDTO = new MusicDTO();
-                    RankingDTO rankingDTO = new RankingDTO();
 
                     // url 추출
                     WebElement urlElement = boardItem.findElement(By.cssSelector("a[data-url]"));
@@ -148,13 +145,15 @@ public class CrawlingService {
 //                    WebElement durationElement = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration"));
 //                    String duration = durationElement.getText();
 
-                    musicDTO.setUrl(dataUrl);
+
                     musicDTO.setArtist(artist);
                     musicDTO.setTitle(title);
+
+                    musicDTO.setUrl(dataUrl);
                     musicDTO.setThumbnail(thumbnail);
                     musicDTO.setDuration("00:00");
-                    musicDTO.setViewCount(views);
                     musicDTO.setReleaseDate(releaseDate);
+                    musicDTO.setViewCount(views);
 
                     if (!musicDTO.isValid()) {
                         retryCount++;
@@ -169,7 +168,6 @@ public class CrawlingService {
                     rankingDTO.setRank(ranking);
                     rankingDTO.setMusic(music);
                     rankingDTO.setRankDate(LocalDate.now());
-
                     Ranking rankingDTOEntity = rankingDTO.toEntity();
                     rankingsRepository.save(rankingDTOEntity);
 

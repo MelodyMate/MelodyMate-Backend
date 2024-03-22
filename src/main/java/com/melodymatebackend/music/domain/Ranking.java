@@ -1,17 +1,20 @@
 package com.melodymatebackend.music.domain;
 
+import com.melodymatebackend.common.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
 @Entity
-@Table(name = "RANKINGS")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Ranking {
+public class Ranking extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")

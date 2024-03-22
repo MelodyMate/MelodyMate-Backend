@@ -1,16 +1,20 @@
 package com.melodymatebackend.music.application;
 
+import com.melodymatebackend.music.application.dto.RankingDto;
 import com.melodymatebackend.music.domain.Music;
 import com.melodymatebackend.music.domain.MusicRepository;
 import com.melodymatebackend.music.domain.Ranking;
 import com.melodymatebackend.music.domain.RankingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,10 +37,28 @@ public class MusicService {
         return musicRepository.findByArtistAndTitle(artist, title);
     }
 
-    public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
-        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
-        List<Map<String, Object>> result = new ArrayList<>();
+    public List<RankingDto> newGetMusicList(LocalDate rankDate){
+        if(rankDate == null){
+            rankDate = LocalDate.now();
+        }
+        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByRankAsc(rankDate);
 
+        List<RankingDto> result = rankings.stream()
+                .map(o -> new RankingDto(o))
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    @Cacheable(cacheNames = "cacheStore")
+    public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
+        if(rankDate == null){
+            rankDate = LocalDate.now();
+        }
+
+        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
+
+        List<Map<String, Object>> result = new ArrayList<>();
         for (Ranking ranking : rankings) {
             Map<String, Object> rankingData = new HashMap<>();
             rankingData.put("ranking", ranking.getRank());
@@ -45,15 +67,20 @@ public class MusicService {
             rankingData.put("url", ranking.getMusic().getUrl());
             rankingData.put("thumbnail", ranking.getMusic().getThumbnail());
             rankingData.put("duration", ranking.getMusic().getDuration());
-            rankingData.put("viewCount", ranking.getMusic().getViewCount());
+            rankingData.put("viewCount", ranking.getMusic().getViewCountList());
             rankingData.put("releaseDate", ranking.getMusic().getReleaseDate());
             rankingData.put("rankDate", ranking.getMusic().getReleaseDate());
             result.add(rankingData);
         }
-
         return result;
-
     }
+
+    @CacheEvict
+    public void cacheDelete(){}
+
+
+
+
 
     public void deleteRankingByRankDate(LocalDate rankDate) {
         rankingsRepository.deleteRankingByRankDate(rankDate);

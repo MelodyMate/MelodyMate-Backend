@@ -1,16 +1,16 @@
 package com.melodymatebackend.domain;
 
+import com.melodymatebackend.common.domain.BaseEntity;
 import com.melodymatebackend.users.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
 @Entity
-@Table(name = "MIXTAPES")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Mixtape {
+public class MixTape extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")

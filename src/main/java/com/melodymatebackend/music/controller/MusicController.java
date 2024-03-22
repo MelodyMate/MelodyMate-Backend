@@ -2,6 +2,7 @@ package com.melodymatebackend.music.controller;
 
 import com.melodymatebackend.music.application.CrawlingService;
 import com.melodymatebackend.music.application.MusicService;
+import com.melodymatebackend.music.application.dto.RankingDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,15 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1.0")
+@RequestMapping("/api")
 public class MusicController {
 
     private final MusicService musicService;
     private final CrawlingService crawlingService;
 
     // chart API 전달
-    @GetMapping("/chart")
-    public ResponseEntity<Map<String, Object>> musicList(@RequestParam(required = false) LocalDate date) {
-        if(date == null){
-            date = LocalDate.now();
-        }
-
+    @GetMapping("/v1.0/chart")
+    public ResponseEntity<Map<String, Object>> musicList(@RequestParam(value = "date",required = false) LocalDate date) {
         List<Map<String, Object>> musicList = musicService.getMusicList(date);
         Map<String, Object> musicData = new LinkedHashMap<>();
 
@@ -39,8 +36,19 @@ public class MusicController {
         musicData.put("data", musicList);
 
         return ResponseEntity.ok(musicData);
-
     }
+
+    @GetMapping("/v1.0/delete")
+    public void cacheDelete(){
+        musicService.cacheDelete();
+    }
+
+    @GetMapping("/v1.1/chart")
+    public ResponseEntity<List<RankingDto>> newMusicList(@RequestParam(value = "date",required = false) LocalDate date) {
+        List<RankingDto> findRankDto = musicService.newGetMusicList(date);
+        return ResponseEntity.ok(findRankDto);
+    }
+
 
     @GetMapping("/admin")
     public void musicSave() throws InterruptedException, IOException {

@@ -1,12 +1,15 @@
 package com.melodymatebackend.music.application.dto;
 
 import com.melodymatebackend.music.domain.Music;
+import com.melodymatebackend.music.domain.ViewCount;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
-public class MusicDTO {
+public class MusicDto {
 
     private String url;
     private String title;
@@ -14,6 +17,7 @@ public class MusicDTO {
     private String thumbnail;
     private String duration;
     private String viewCount;
+    private List<ViewCount> viewCountList;
     private String releaseDate;
 
     public Music toEntity() {
@@ -23,14 +27,8 @@ public class MusicDTO {
                 .artist(artist)
                 .thumbnail(thumbnail)
                 .duration(duration)
-                .viewCount(viewCount)
+                .viewCountList(viewCountList)
                 .releaseDate(releaseDate)
-                .build();
-    }
-
-    public Music updateViewCount(){
-        return Music.builder()
-                .viewCount(viewCount)
                 .build();
     }
 

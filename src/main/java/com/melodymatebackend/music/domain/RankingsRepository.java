@@ -17,4 +17,7 @@ public interface RankingsRepository extends JpaRepository<Ranking, Long> {
     List<Ranking> findByRankDateOrderByIdAsc(LocalDate rankDate);
 
     void deleteRankingByRankDate(LocalDate rankDate);
+
+    @EntityGraph(attributePaths = "music")
+    List<Ranking> findByRankDateOrderByRankAsc(LocalDate rankDate);
 }
