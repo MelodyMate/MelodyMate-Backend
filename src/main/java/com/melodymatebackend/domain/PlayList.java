@@ -1,5 +1,6 @@
 package com.melodymatebackend.domain;
 
+import com.melodymatebackend.common.domain.BaseEntity;
 import com.melodymatebackend.users.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,11 +9,10 @@ import java.time.Instant;
 
 @Getter
 @Entity
-@Table(name = "PLAYLIST")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Playlist {
+public class PlayList extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")

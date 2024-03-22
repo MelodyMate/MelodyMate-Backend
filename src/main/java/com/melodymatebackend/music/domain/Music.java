@@ -1,18 +1,20 @@
 package com.melodymatebackend.music.domain;
 
+import com.melodymatebackend.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@SequenceGenerator(name = "music_seq", sequenceName = "music_seq", initialValue = 1, allocationSize = 1)
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Entity
-@Table(name = "MUSIC")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Music {
+public class Music extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "music_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
@@ -31,10 +33,16 @@ public class Music {
     @Column(name = "duration", nullable = false, length = 20)
     private String duration;
 
-    @Column(name = "viewCount", nullable = false, length = 15)
-    private String viewCount;
-
     @Column(name = "releaseDate", nullable = false, length = 15)
     private String releaseDate;
+
+    @OneToMany(mappedBy = "music")
+    private List<ViewCount> viewCountList = new ArrayList<>();
+
+    public void addViewCount(ViewCount viewCount ) {
+        viewCountList.add(viewCount);
+        viewCount.setMusic(this);
+    }
+
 
 }
