@@ -12,12 +12,6 @@ public class ApiResponse {
 
     private String errorMessage;
 
-    public ApiResponse(int status, String message, Object data) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
-    }
-
     public ApiResponse(int status, String message, String errorMessage) {
         this.status = status;
         this.message = message;

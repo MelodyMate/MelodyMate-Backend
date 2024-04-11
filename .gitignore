@@ -39,7 +39,6 @@ out/
 ### custom ###
 .github
 .gitignore
-build.gradle
 gradlew
 gradlew.bat
 settings.gradle

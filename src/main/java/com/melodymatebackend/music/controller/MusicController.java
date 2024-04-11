@@ -38,11 +38,6 @@ public class MusicController {
         return ResponseEntity.ok(musicData);
     }
 
-    @GetMapping("/v1.0/delete")
-    public void cacheDelete(){
-        musicService.cacheDelete();
-    }
-
     @GetMapping("/v1.1/chart")
     public ResponseEntity<List<RankingDto>> newMusicList(@RequestParam(value = "date",required = false) LocalDate date) {
         List<RankingDto> findRankDto = musicService.newGetMusicList(date);

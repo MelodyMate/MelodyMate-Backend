@@ -2,7 +2,10 @@ package com.melodymatebackend.music.application;
 
 import com.melodymatebackend.music.application.dto.MusicDto;
 import com.melodymatebackend.music.application.dto.RankingDto;
-import com.melodymatebackend.music.domain.*;
+import com.melodymatebackend.music.domain.Music;
+import com.melodymatebackend.music.domain.MusicRepository;
+import com.melodymatebackend.music.domain.Ranking;
+import com.melodymatebackend.music.domain.RankingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -46,7 +49,6 @@ public class CrawlingService {
         String url = "https://www.kpop-radar.com/?type=1&date=2&gender=1";
 
         WebDriver driver = getWebDriver(url);
-        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         dataCrawling(driver, js);
@@ -63,14 +65,25 @@ public class CrawlingService {
     }
 
     private static WebDriver getWebDriver(String url) {
+        String osName = System.getProperty("os.name").toLowerCase();
+        // mac
+        if (osName.contains("Mac"))
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+
+            // raspberryPi
+        else if (osName.contains("linux") && osName.contains("arm"))
+            System.setProperty("webdriver.chrome.driver", "/usr/lib/chromium-browser/chromedriver");
+
+            // docker container
+        else if (osName.contains("linux")) {
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+        }
+
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*");
         options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
-        options.addArguments("window-size=1920x1080");
-//        options.addArguments("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Whale/3.21.192.22 Safari/537.36");
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
         return driver;
@@ -80,14 +93,15 @@ public class CrawlingService {
     public void dataCrawling(WebDriver driver, JavascriptExecutor js) throws InterruptedException {
         int maxRetry = 3;
 
-        WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(60));
+//        mainWait.until(ExpectedConditions.urlToBe("https://www.kpop-radar.com/?type=1&date=2&gender=1"));
         mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
+
         // 추출
         List<WebElement> boardItems = driver.findElements(By.className("board_item"));
 
         MusicDto musicDTO = new MusicDto();
         RankingDto rankingDTO = new RankingDto();
-//        Music music = new Music();
 
         for (WebElement boardItem : boardItems) {
             int retryCount = 0;
@@ -155,11 +169,11 @@ public class CrawlingService {
                     musicDTO.setReleaseDate(releaseDate);
                     musicDTO.setViewCount(views);
 
-                    if (!musicDTO.isValid()) {
-                        retryCount++;
-                        log.error("data is null");
-                        return;
-                    }
+//                    if (!musicDTO.isValid()) {
+//                        retryCount++;
+//                        log.error("data is null");
+//                        return;
+//                    }
 
                     Music music = musicDTO.toEntity();
 
@@ -169,6 +183,7 @@ public class CrawlingService {
                     rankingDTO.setMusic(music);
                     rankingDTO.setRankDate(LocalDate.now());
                     Ranking rankingDTOEntity = rankingDTO.toEntity();
+
                     rankingsRepository.save(rankingDTOEntity);
 
                     break;

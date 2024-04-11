@@ -2,12 +2,11 @@ package com.melodymatebackend.music.application.dto;
 
 import com.melodymatebackend.music.domain.Music;
 import com.melodymatebackend.music.domain.Ranking;
-import com.melodymatebackend.music.domain.ViewCount;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter

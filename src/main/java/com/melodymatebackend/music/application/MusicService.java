@@ -7,8 +7,6 @@ import com.melodymatebackend.music.domain.Ranking;
 import com.melodymatebackend.music.domain.RankingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,15 +48,16 @@ public class MusicService {
         return result;
     }
 
-    @Cacheable(cacheNames = "cacheStore")
     public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
         if(rankDate == null){
             rankDate = LocalDate.now();
         }
+        System.out.println(rankDate);
 
         List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
 
         List<Map<String, Object>> result = new ArrayList<>();
+
         for (Ranking ranking : rankings) {
             Map<String, Object> rankingData = new HashMap<>();
             rankingData.put("ranking", ranking.getRank());
@@ -72,15 +71,9 @@ public class MusicService {
             rankingData.put("rankDate", ranking.getMusic().getReleaseDate());
             result.add(rankingData);
         }
+
         return result;
     }
-
-    @CacheEvict
-    public void cacheDelete(){}
-
-
-
-
 
     public void deleteRankingByRankDate(LocalDate rankDate) {
         rankingsRepository.deleteRankingByRankDate(rankDate);

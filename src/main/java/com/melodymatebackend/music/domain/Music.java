@@ -33,7 +33,7 @@ public class Music extends BaseEntity {
     @Column(name = "duration", nullable = false, length = 20)
     private String duration;
 
-    @Column(name = "releaseDate", nullable = false, length = 15)
+    @Column(name = "releaseDate", nullable = true, length = 15)
     private String releaseDate;
 
     @OneToMany(mappedBy = "music")

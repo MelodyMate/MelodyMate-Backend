@@ -20,6 +20,6 @@ public class ViewCount extends BaseEntity {
     @JoinColumn(name = "music_id")
     private Music music;
 
-    @Column(name = "viewCount", nullable = false, length = 15)
+    @Column(name = "viewCount", nullable = true, length = 15)
     private String viewCount;
 }
