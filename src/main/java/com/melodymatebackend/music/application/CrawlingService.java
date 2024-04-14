@@ -2,10 +2,8 @@ package com.melodymatebackend.music.application;
 
 import com.melodymatebackend.music.application.dto.MusicDto;
 import com.melodymatebackend.music.application.dto.RankingDto;
-import com.melodymatebackend.music.domain.Music;
-import com.melodymatebackend.music.domain.MusicRepository;
-import com.melodymatebackend.music.domain.Ranking;
-import com.melodymatebackend.music.domain.RankingsRepository;
+import com.melodymatebackend.music.application.dto.ViewCountDto;
+import com.melodymatebackend.music.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -35,6 +33,7 @@ public class CrawlingService {
     private final RankingsRepository rankingsRepository;
 
     private final MusicService musicService;
+    private final ViewCountRepository viewCountRepository;
 
 
     @Transactional(readOnly = false)
@@ -80,10 +79,13 @@ public class CrawlingService {
         }
 
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
         options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
+        options.addArguments("--start-maximized");
+
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
         return driver;
@@ -95,7 +97,8 @@ public class CrawlingService {
 
         WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(60));
 //        mainWait.until(ExpectedConditions.urlToBe("https://www.kpop-radar.com/?type=1&date=2&gender=1"));
-        mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
+//        mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
+        WebElement element = mainWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("board_item")));
 
         // 추출
         List<WebElement> boardItems = driver.findElements(By.className("board_item"));
@@ -162,7 +165,6 @@ public class CrawlingService {
 
                     musicDTO.setArtist(artist);
                     musicDTO.setTitle(title);
-
                     musicDTO.setUrl(dataUrl);
                     musicDTO.setThumbnail(thumbnail);
                     musicDTO.setDuration("00:00");
@@ -176,7 +178,6 @@ public class CrawlingService {
 //                    }
 
                     Music music = musicDTO.toEntity();
-
                     musicRepository.save(music);
 
                     rankingDTO.setRank(ranking);

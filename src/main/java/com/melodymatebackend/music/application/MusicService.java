@@ -52,7 +52,6 @@ public class MusicService {
         if(rankDate == null){
             rankDate = LocalDate.now();
         }
-        System.out.println(rankDate);
 
         List<Ranking> rankings = rankingsRepository.findByRankDateOrderByIdAsc(rankDate);
 
@@ -68,7 +67,7 @@ public class MusicService {
             rankingData.put("duration", ranking.getMusic().getDuration());
             rankingData.put("viewCount", ranking.getMusic().getViewCountList());
             rankingData.put("releaseDate", ranking.getMusic().getReleaseDate());
-            rankingData.put("rankDate", ranking.getMusic().getReleaseDate());
+            rankingData.put("rankDate", ranking.getRankDate());
             result.add(rankingData);
         }
 
