@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sshagent (credentials: ['host-ssh']) {
                 sh """
-                    echo hi
+                  ssh -o StrictHostKeyChecking=no ubuntu@146.56.106.70 "echo hi"
                 """
                 }
             }
