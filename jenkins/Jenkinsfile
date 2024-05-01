@@ -32,6 +32,9 @@ pipeline {
                 sh """
                   ssh -o StrictHostKeyChecking=no ubuntu@146.56.106.70 '
                   scp -i /home/ubuntu/oracle.ppk /home/ubuntu/docker/jenkins/jobs/MelodyMate/workspace/build/libs/app.jar ubuntu@146.56.118.211:/home/ubuntu/docker/
+                  cd /home/ubuntu/docker
+                  sudo docker compose down server --rmi all
+                  sudo docker compose up -d
                   '
                 """
                 }
