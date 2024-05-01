@@ -31,7 +31,7 @@ pipeline {
                 sshagent (credentials: ['host-ssh']) {
                 sh """
                   ssh -o StrictHostKeyChecking=no ubuntu@146.56.106.70 '
-                  scp /home/ubuntu/docker/jenkins/jobs/MelodyMate/workspace/build/libs/app.jar ubuntu@146.56.118.211:/home/ubuntu/docker/
+                  echo hihi
                   '
                 """
                 }
