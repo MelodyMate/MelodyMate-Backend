@@ -14,9 +14,7 @@ pipeline {
 
         stage('source build') {
             steps {
-                dir('backend'){
-                    sh 'gradle clean bootJar'
-                }
+                sh 'gradle clean bootJar'
             }
         }
 
