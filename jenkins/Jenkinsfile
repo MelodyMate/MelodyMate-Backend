@@ -20,7 +20,7 @@ pipeline {
 
         stage('Renames the build file') {
             steps {
-                dir('backend/build/libs'){
+                dir('build/libs'){
                     sh 'mv *.jar app.jar'
                 }
             }
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent (credentials: ['	host-ssh']) {
+                sshagent (credentials: ['host-ssh']) {
                 sh """
                     echo hi
                 """
