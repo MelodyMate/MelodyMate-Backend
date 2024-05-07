@@ -1,20 +1,26 @@
 package com.melodymatebackend.users.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "USERS")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Long id;
 
     @Column(name = "email", nullable = false, length = 50)
@@ -25,5 +31,11 @@ public class User {
 
     @Column(name = "nickname", nullable = false, length = 30)
     private String nickname;
+
+    private String username;
+
+    private String picture;
+    
+    private String role;
 
 }
