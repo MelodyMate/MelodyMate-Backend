@@ -30,12 +30,8 @@ pipeline {
             steps {
                 sshagent (credentials: ['host-ssh']) {
                 sh """
-                  ssh -o StrictHostKeyChecking=no ubuntu@146.56.106.70 '
                   scp -i /home/ubuntu/oracle.ppk /home/ubuntu/docker/jenkins/jobs/MelodyMate/workspace/build/libs/app.jar ubuntu@146.56.118.211:/home/ubuntu/docker/
-                  cd /home/ubuntu/docker
-                  sudo docker compose down server --rmi all
-                  sudo docker compose up -d
-                  '
+                  ssh -o StrictHostKeyChecking=no ubuntu@146.56.106.70 "/home/ubuntu/docker/deploy_backend.sh"
                 """
                 }
             }
@@ -43,89 +39,4 @@ pipeline {
 
 
     }
-}
-
-
-
-
-pipeline {
-    agent any
-
-    tools {
-        gradle 'gradle'
-    }
-
-    stages {
-//         stage('Start CI/CD'){
-//             steps {
-//                 sh """
-//                 curl \
-//                 -X POST https://wh.jandi.com/connect-api/webhook/29209667/d263ad0fded08e77c1dca4d11dde0d46 \
-//                 -H 'Accept: application/vnd.tosslab.jandi-v2+json' \
-//                 -H 'Content-Type: application/json' \
-//                 --data-binary '{"body":"[[시작]](http://url_to_text) 스마트태권도 백엔드 빌드 시작.","connectColor":"#FAC11B","connectInfo":[{"title":"스마트태권도 백엔드 빌드 시작","description":"${TODAY} 빌드 시작"}
-//                 ]}'
-//                 """
-//             }
-//         }
-
-        stage('github clone') {
-            steps {
-                    checkout scmGit(
-                        branches: [[name: '*/back_dev']],
-                        userRemoteConfigs: [[credentialsId: 'git-token', url: 'https://github.com/globepoint-github/smart-taekwondo.git']]
-                    )
-                }
-        }
-
-        stage('source build') {
-            steps {
-                echo "${env.BUILD_ID}"
-                dir('backend'){
-                    sh 'gradle clean bootJar'
-                }
-            }
-        }
-
-        stage('Renames the build file') {
-            steps {
-                dir('backend/build/libs'){
-                    sh 'mv *.jar app.jar'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sshagent (credentials: ['	host-ssh']) {
-                sh """
-                    ssh -o StrictHostKeyChecking=no rocky@172.17.0.1 "/home/rocky/dockerfile/deploy_backend.sh"
-                """
-                }
-            }
-        }
-    }
-
-//     post {
-//         success {
-//             sh '''
-//                 curl \
-//                 -X POST https://wh.jandi.com/connect-api/webhook/29209667/d263ad0fded08e77c1dca4d11dde0d46 \
-//                 -H "Accept: application/vnd.tosslab.jandi-v2+json" \
-//                 -H "Content-Type: application/json" \
-//                 --data-binary '{"body":"[[성공]](http://url_to_text) You have a new Pizza order.","connectColor":"#FAC11B","connectInfo":[{"title":"Topping","description":"Pepperoni"},
-//                 {"title":"Location","description":"Empire State Building, 5th Ave, New York","imageUrl":"Url_to_text"}]}'
-//             '''
-//         }
-//         failure {
-//             sh '''
-//                 curl \
-//                 -X POST https://wh.jandi.com/connect-api/webhook/29209667/d263ad0fded08e77c1dca4d11dde0d46 \
-//                 -H "Accept: application/vnd.tosslab.jandi-v2+json" \
-//                 -H "Content-Type: application/json" \
-//                 --data-binary '{"body":"[[실패]](http://url_to_text) You have a new Pizza order.","connectColor":"#FAC11B","connectInfo":[{"title":"Topping","description":"Pepperoni"},
-//                 {"title":"Location","description":"Empire State Building, 5th Ave, New York","imageUrl":"Url_to_text"}]}'
-//             '''
-//         }
-//     }
 }
