@@ -3,7 +3,16 @@ package com.melodymatebackend.music.application;
 import com.melodymatebackend.music.application.dto.MusicDto;
 import com.melodymatebackend.music.application.dto.RankingDto;
 import com.melodymatebackend.music.application.dto.ViewCountDto;
-import com.melodymatebackend.music.domain.*;
+import com.melodymatebackend.music.domain.Music;
+import com.melodymatebackend.music.domain.MusicRepository;
+import com.melodymatebackend.music.domain.Ranking;
+import com.melodymatebackend.music.domain.RankingsRepository;
+import com.melodymatebackend.music.domain.ViewCount;
+import com.melodymatebackend.music.domain.ViewCountRepository;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -12,16 +21,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -66,14 +68,16 @@ public class CrawlingService {
     private static WebDriver getWebDriver(String url) {
         String osName = System.getProperty("os.name").toLowerCase();
         // mac
-        if (osName.contains("Mac"))
+        if (osName.contains("Mac")) {
             System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+        }
 
-            // raspberryPi
-        else if (osName.contains("linux") && osName.contains("arm"))
+        // raspberryPi
+        else if (osName.contains("linux") && osName.contains("arm")) {
             System.setProperty("webdriver.chrome.driver", "/usr/lib/chromium-browser/chromedriver");
+        }
 
-            // docker container
+        // docker container
         else if (osName.contains("linux")) {
             System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         }
@@ -95,11 +99,6 @@ public class CrawlingService {
     public void dataCrawling(WebDriver driver, JavascriptExecutor js) throws InterruptedException {
         int maxRetry = 3;
 
-        WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(60));
-//        mainWait.until(ExpectedConditions.urlToBe("https://www.kpop-radar.com/?type=1&date=2&gender=1"));
-//        mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
-        WebElement element = mainWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("board_item")));
-
         // 추출
         List<WebElement> boardItems = driver.findElements(By.className("board_item"));
 
@@ -117,20 +116,24 @@ public class CrawlingService {
 
                     // 순위 추출
                     WebElement rankingElement = boardItem.findElement(By.cssSelector(".ranking"));
-                    String ranking = (String) js.executeScript("return arguments[0].firstChild.textContent.trim()", rankingElement);
+                    int ranking = (int) js.executeScript(
+                        "return arguments[0].firstChild.textContent.trim()", rankingElement);
 
                     // 가수 추출(태그가 다를 경우 오류 발생)
                     String artist;
                     try {
-                        WebElement artistElement = boardItem.findElement(By.cssSelector(".title a span"));
+                        WebElement artistElement = boardItem.findElement(
+                            By.cssSelector(".title a span"));
                         artist = artistElement.getText();
                     } catch (Exception e) {
-                        WebElement noArtistElement = boardItem.findElement(By.cssSelector(".title .no_artist_board"));
+                        WebElement noArtistElement = boardItem.findElement(
+                            By.cssSelector(".title .no_artist_board"));
                         artist = noArtistElement.getText();
                     }
 
                     // 제목 추출
-                    WebElement titleElement = boardItem.findElement(By.cssSelector(".title strong"));
+                    WebElement titleElement = boardItem.findElement(
+                        By.cssSelector(".title strong"));
                     String title = titleElement.getText();
 
                     // 조회수 추출
@@ -138,11 +141,13 @@ public class CrawlingService {
                     String views = viewsElement.getText();
 
                     // 릴리즈 날짜 추출
-                    WebElement releaseElement = boardItem.findElement(By.cssSelector(".release span"));
+                    WebElement releaseElement = boardItem.findElement(
+                        By.cssSelector(".release span"));
                     String releaseDate = releaseElement.getText();
 
                     // 썸네일 추출
-                    WebElement thumbnailElement = boardItem.findElement(By.cssSelector(".board_item .cf4a img:nth-of-type(4)"));
+                    WebElement thumbnailElement = boardItem.findElement(
+                        By.cssSelector(".board_item .cf4a img:nth-of-type(4)"));
                     String thumbnail = thumbnailElement.getAttribute("src");
 
                     // 재생시간 추출
@@ -162,33 +167,37 @@ public class CrawlingService {
 //                    WebElement durationElement = driver.findElement(By.cssSelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > div.ytp-time-display.notranslate > span:nth-child(2) > span.ytp-time-duration"));
 //                    String duration = durationElement.getText();
 
+                    Optional<Music> findMusic = musicRepository.findByArtistAndTitle(artist,
+                        title);
 
-                    musicDTO.setArtist(artist);
-                    musicDTO.setTitle(title);
-                    musicDTO.setUrl(dataUrl);
-                    musicDTO.setThumbnail(thumbnail);
-                    musicDTO.setDuration("00:00");
-                    musicDTO.setReleaseDate(releaseDate);
-                    musicDTO.setViewCount(views);
+                    Music music;
 
-//                    if (!musicDTO.isValid()) {
-//                        retryCount++;
-//                        log.error("data is null");
-//                        return;
-//                    }
+                    if (findMusic.isPresent()) {
+                        music = findMusic.get();
+                    } else {
+                        musicDTO.setArtist(artist);
+                        musicDTO.setTitle(title);
+                        musicDTO.setUrl(dataUrl);
+                        musicDTO.setThumbnail(thumbnail);
+                        musicDTO.setDuration("00:00");
+                        musicDTO.setReleaseDate(releaseDate);
 
-                    Music music = musicDTO.toEntity();
-                    musicRepository.save(music);
+                        music = musicDTO.toEntity();
+                        music = musicRepository.save(music);
+                    }
+
+                    ViewCountDto viewCountDto = new ViewCountDto(music, views);
+                    ViewCount viewCountEntity = viewCountDto.toEntity();
+                    viewCountRepository.save(viewCountEntity);
 
                     rankingDTO.setRank(ranking);
                     rankingDTO.setMusic(music);
                     rankingDTO.setRankDate(LocalDate.now());
-                    Ranking rankingDTOEntity = rankingDTO.toEntity();
 
+                    Ranking rankingDTOEntity = rankingDTO.toEntity();
                     rankingsRepository.save(rankingDTOEntity);
 
                     break;
-
 
                 } catch (Exception e) {
                     retryCount++;

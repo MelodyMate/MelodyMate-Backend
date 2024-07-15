@@ -1,13 +1,19 @@
 package com.melodymatebackend.music.domain;
 
 import com.melodymatebackend.common.domain.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -15,6 +21,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Ranking extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
@@ -24,9 +31,9 @@ public class Ranking extends BaseEntity {
     private LocalDate rankDate;
 
     @Column(name = "ranking", nullable = false)
-    private String rank;
+    private Integer rank;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "music_id", nullable = false, columnDefinition = "NUMERIC(19, 0)")
     private Music music;
 

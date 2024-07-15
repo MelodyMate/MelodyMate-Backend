@@ -1,18 +1,21 @@
 package com.melodymatebackend.music.application;
 
-import com.melodymatebackend.music.application.dto.RankingDto;
+import com.melodymatebackend.music.application.dto.NewMusicResponse;
+import com.melodymatebackend.music.application.dto.NewRankingResponse;
 import com.melodymatebackend.music.domain.Music;
 import com.melodymatebackend.music.domain.MusicRepository;
 import com.melodymatebackend.music.domain.Ranking;
 import com.melodymatebackend.music.domain.RankingsRepository;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,25 +34,27 @@ public class MusicService {
         return musicRepository.existsByArtistAndTitle(artist, title);
     }
 
-    public Music findByArtistAndTitle(String artist, String title) {
-        return musicRepository.findByArtistAndTitle(artist, title);
-    }
+    public NewRankingResponse newGetMusicList(LocalDate rankDate) {
 
-    public List<RankingDto> newGetMusicList(LocalDate rankDate){
-        if(rankDate == null){
+        if (rankDate == null) {
             rankDate = LocalDate.now();
         }
+
         List<Ranking> rankings = rankingsRepository.findByRankDateOrderByRankAsc(rankDate);
 
-        List<RankingDto> result = rankings.stream()
-                .map(o -> new RankingDto(o))
-                .collect(Collectors.toList());
+        List<NewMusicResponse> list = rankings.stream()
+            .sorted(Comparator.comparing(Ranking::getRank))
+            .map(NewMusicResponse::new)
+            .toList();
 
-        return result;
+        int size = list.size();
+        LocalDate now = LocalDate.now();
+
+        return new NewRankingResponse(size, now, list);
     }
 
     public List<Map<String, Object>> getMusicList(LocalDate rankDate) {
-        if(rankDate == null){
+        if (rankDate == null) {
             rankDate = LocalDate.now();
         }
 
