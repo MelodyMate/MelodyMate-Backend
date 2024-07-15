@@ -10,6 +10,7 @@ import com.melodymatebackend.music.domain.RankingsRepository;
 import com.melodymatebackend.music.domain.ViewCount;
 import com.melodymatebackend.music.domain.ViewCountRepository;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +56,9 @@ public class CrawlingService {
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         dataCrawling(driver, js);
+
         // 2페이지 이동
+        log.info("2페이지");
         WebElement pageButton = driver.findElement(By.cssSelector("#paging > a:nth-child(2)"));
         pageButton.click();
 
@@ -98,6 +103,12 @@ public class CrawlingService {
     @Transactional(readOnly = false)
     public void dataCrawling(WebDriver driver, JavascriptExecutor js) throws InterruptedException {
         int maxRetry = 3;
+
+        WebDriverWait mainWait = new WebDriverWait(driver, Duration.ofSeconds(60));
+//        mainWait.until(ExpectedConditions.urlToBe("https://www.kpop-radar.com/?type=1&date=2&gender=1"));
+//        mainWait.until(ExpectedConditions.presenceOfElementLocated(By.className("board_item")));
+        WebElement element = mainWait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.className("board_item")));
 
         // 추출
         List<WebElement> boardItems = driver.findElements(By.className("board_item"));
