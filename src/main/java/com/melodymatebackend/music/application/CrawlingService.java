@@ -116,8 +116,8 @@ public class CrawlingService {
 
                     // 순위 추출
                     WebElement rankingElement = boardItem.findElement(By.cssSelector(".ranking"));
-                    int ranking = (int) js.executeScript(
-                        "return arguments[0].firstChild.textContent.trim()", rankingElement);
+                    int ranking = Integer.parseInt((String) js.executeScript(
+                        "return arguments[0].firstChild.textContent.trim()", rankingElement));
 
                     // 가수 추출(태그가 다를 경우 오류 발생)
                     String artist;

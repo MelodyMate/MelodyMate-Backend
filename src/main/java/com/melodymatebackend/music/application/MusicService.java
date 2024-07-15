@@ -40,7 +40,11 @@ public class MusicService {
             rankDate = LocalDate.now();
         }
 
-        List<Ranking> rankings = rankingsRepository.findByRankDateOrderByRankAsc(rankDate);
+        List<Ranking> rankings = rankingsRepository.findByRankDate(rankDate);
+
+        if (rankings.isEmpty()) {
+            rankings = rankingsRepository.findByRankDate(rankDate.minusDays(1));
+        }
 
         List<NewMusicResponse> list = rankings.stream()
             .sorted(Comparator.comparing(Ranking::getRank))
