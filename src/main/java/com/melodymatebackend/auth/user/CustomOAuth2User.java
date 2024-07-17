@@ -1,4 +1,4 @@
-package com.melodymatebackend.auth.dto;
+package com.melodymatebackend.auth.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,11 +15,6 @@ public class CustomOAuth2User implements OAuth2User {
     }
 
     @Override
-    public <A> A getAttribute(String name) {
-        return OAuth2User.super.getAttribute(name);
-    }
-
-    @Override
     public Map<String, Object> getAttributes() {
 
         return null;
@@ -27,24 +22,29 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new GrantedAuthority() {
+
+        Collection<GrantedAuthority> collection = new ArrayList<>();
+
+        collection.add(new GrantedAuthority() {
 
             @Override
             public String getAuthority() {
-                return userDTO.role();
+
+                return userDTO.getRole();
             }
         });
 
-        return authorities;
+        return collection;
     }
 
     @Override
     public String getName() {
-        return userDTO.name();
+        return userDTO.getName();
     }
 
     public String getUsername() {
-        return userDTO.username();
+        return userDTO.getUsername();
     }
+
+
 }

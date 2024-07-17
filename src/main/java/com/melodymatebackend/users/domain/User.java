@@ -1,5 +1,6 @@
 package com.melodymatebackend.users.domain;
 
+import com.melodymatebackend.auth.user.OAuth2Response;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,7 +36,16 @@ public class User {
     private String username;
 
     private String picture;
-    
+
     private String role;
 
+    private String imageUrl;
+
+    public void dataUpdate(OAuth2Response oAuth2Response, User existData) {
+        this.email = oAuth2Response.getEmail();
+        this.nickname = oAuth2Response.getName();
+        this.username = existData.getUsername();
+        this.role = existData.getRole();
+        this.imageUrl = existData.getImageUrl();
+    }
 }

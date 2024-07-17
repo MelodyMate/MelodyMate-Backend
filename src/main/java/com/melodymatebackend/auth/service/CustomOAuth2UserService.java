@@ -1,14 +1,12 @@
 package com.melodymatebackend.auth.service;
 
-import com.melodymatebackend.auth.dto.CustomOAuth2User;
-import com.melodymatebackend.auth.dto.KakaoResponse;
-import com.melodymatebackend.auth.dto.OAuth2Response;
-import com.melodymatebackend.auth.dto.UserDTO;
+import com.melodymatebackend.auth.user.CustomOAuth2User;
+import com.melodymatebackend.auth.user.KakaoResponse;
+import com.melodymatebackend.auth.user.OAuth2Response;
+import com.melodymatebackend.auth.user.UserDTO;
 import com.melodymatebackend.users.domain.User;
 import com.melodymatebackend.users.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -19,56 +17,57 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
     private final UsersRepository usersRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
-        log.info("CustomOAuth2UserService loadUser");
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        System.out.println(oAuth2User);
 
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
 
-        String registerId = userRequest.getClientRegistration().getRegistrationId();
-        log.info("login +++" + oAuth2User.getAttributes());
-
-        if (registerId.equals("kakao")) {
+        if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
+        } else {
+            return null;
         }
 
         String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+        User existData = usersRepository.findByUsername(username);
 
-        User existDate = usersRepository.findByUsername(username);
+        if (existData == null) {
 
-        if (existDate == null) {
-            User buildUser = User.builder()
+            User userEntity = User.builder()
                 .username(username)
                 .email(oAuth2Response.getEmail())
-                .nickname(oAuth2Response.getNickname())
-                .picture(oAuth2Response.getPicture())
+                .nickname(oAuth2Response.getName())
                 .role("ROLE_USER")
+                .imageUrl(oAuth2Response.getImageUrl())
                 .build();
-            usersRepository.save(buildUser);
 
-            UserDTO userDTO = new UserDTO(username, oAuth2Response.getNickname(), "ROLE_USER");
+            usersRepository.save(userEntity);
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUsername(username);
+            userDTO.setName(oAuth2Response.getName());
+            userDTO.setRole("ROLE_USER");
 
             return new CustomOAuth2User(userDTO);
-
         } else {
 
-            User buildUser = existDate.builder()
-                .email(existDate.getEmail())
-                .nickname(existDate.getNickname())
-                .picture(existDate.getPicture())
-                .role(existDate.getRole())
-                .build();
-            usersRepository.save(buildUser);
+            existData.dataUpdate(oAuth2Response, existData);
 
-            UserDTO userDTO = new UserDTO(username, oAuth2Response.getNickname(), "ROLE_USER");
+            usersRepository.save(existData);
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUsername(existData.getUsername());
+            userDTO.setName(oAuth2Response.getName());
+            userDTO.setRole(existData.getRole());
+            userDTO.setImageUrl(existData.getImageUrl());
 
             return new CustomOAuth2User(userDTO);
         }
-
     }
 }
