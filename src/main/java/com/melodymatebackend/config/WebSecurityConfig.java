@@ -1,5 +1,6 @@
 package com.melodymatebackend.config;
 
+import com.melodymatebackend.auth.handler.CustomSuccessHandler;
 import com.melodymatebackend.auth.jwt.JWTFilter;
 import com.melodymatebackend.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,30 +20,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
     private final JWTFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
+            .logout(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
 
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/**").permitAll()
+                    .requestMatchers("/**").permitAll()
+//                .anyRequest().authenticated()
             )
 
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .oauth2Login(configure ->
-                    configure
-                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
-//                    .successHandler()
+            .oauth2Login((configure) -> configure
+                    .userInfoEndpoint((config) -> config
+                        .userService(customOAuth2UserService))
+                    .successHandler(customSuccessHandler)
 //                    .failureHandler()
-            );
-
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -51,4 +54,5 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

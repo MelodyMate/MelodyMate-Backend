@@ -1,7 +1,9 @@
 package com.melodymatebackend.auth.handler;
 
-import com.melodymatebackend.auth.service.JWTUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.melodymatebackend.auth.jwt.TokenProvider;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,12 +18,39 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JWTUtil jwtUtil;
+    private final TokenProvider tokenProvider;
+    private static final String URI = "https://melodymate.netlify.app/";
+    private ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
+        log.info("successful authentication");
+        // accessToken, refreshToken 발급
+        String accessToken = tokenProvider.generateAccessToken(authentication);
 
-        log.info("로그인 성공??!!");
+//        tokenProvider.generateRefreshToken(authentication, accessToken);
+
+        response.addCookie(createCookie("Authorization", accessToken));
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+//        TokenDTO tokenDTO = new TokenDTO(accessToken);
+//
+//        String result = objectMapper.writeValueAsString(tokenDTO);
+//
+        response.sendRedirect(URI);
     }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(60 * 60 * 60);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+
+        return cookie;
+    }
+
 }

@@ -7,23 +7,28 @@ import com.melodymatebackend.auth.user.UserDTO;
 import com.melodymatebackend.users.domain.User;
 import com.melodymatebackend.users.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UsersRepository usersRepository;
 
+    @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println(oAuth2User);
+
+        log.info("loadUser oAuth2User === {}", oAuth2User.getAttributes());
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
@@ -54,6 +59,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setName(oAuth2Response.getName());
             userDTO.setRole("ROLE_USER");
 
+            log.info("user == null === {}", new CustomOAuth2User(userDTO));
+
             return new CustomOAuth2User(userDTO);
         } else {
 
@@ -66,6 +73,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setName(oAuth2Response.getName());
             userDTO.setRole(existData.getRole());
             userDTO.setImageUrl(existData.getImageUrl());
+
+            log.info("user != null === {}", oAuth2Response.getImageUrl());
 
             return new CustomOAuth2User(userDTO);
         }
