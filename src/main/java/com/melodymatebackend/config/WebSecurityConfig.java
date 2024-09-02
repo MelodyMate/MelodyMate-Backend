@@ -1,8 +1,8 @@
 package com.melodymatebackend.config;
 
-import com.melodymatebackend.auth.handler.CustomSuccessHandler;
-import com.melodymatebackend.auth.jwt.JWTFilter;
-import com.melodymatebackend.auth.service.CustomOAuth2UserService;
+import com.melodymatebackend.auth.hanlder.CustomSuccessHandler;
+import com.melodymatebackend.auth.jwt.filter.JWTFilter;
+import com.melodymatebackend.auth.service.CustomOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2Service customOAuth2Service;
+
     private final CustomSuccessHandler customSuccessHandler;
+    //    private final CustomFailureHandler customFailureHandler;
+//    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final JWTFilter jwtFilter;
 
     @Bean
@@ -31,19 +34,14 @@ public class WebSecurityConfig {
             .logout(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
 
-            .authorizeHttpRequests((requests) -> requests
-                    .requestMatchers("/**").permitAll()
-//                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
 
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .oauth2Login((configure) -> configure
-                    .userInfoEndpoint((config) -> config
-                        .userService(customOAuth2UserService))
-                    .successHandler(customSuccessHandler)
-//                    .failureHandler()
+            .oauth2Login(config -> config
+                .successHandler(customSuccessHandler)
+                .userInfoEndpoint(c -> c.userService(customOAuth2Service))
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -1,8 +1,11 @@
 package com.melodymatebackend.users.domain;
 
-import com.melodymatebackend.auth.user.OAuth2Response;
+import com.melodymatebackend.auth.domain.ProviderType;
+import com.melodymatebackend.auth.domain.RoleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,19 +36,24 @@ public class User {
     @Column(name = "nickname", nullable = false, length = 30)
     private String nickname;
 
-    private String username;
+    private String providerId;
 
-    private String picture;
+    @Enumerated(EnumType.STRING)
+    private ProviderType providerType;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 
     private String imageUrl;
 
-    public void dataUpdate(OAuth2Response oAuth2Response, User existData) {
-        this.email = oAuth2Response.getEmail();
-        this.nickname = oAuth2Response.getName();
-        this.username = existData.getUsername();
-        this.role = existData.getRole();
-        this.imageUrl = existData.getImageUrl();
+    public User update(String nickname, String imageUrl) {
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+        return this;
     }
+
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
+
 }

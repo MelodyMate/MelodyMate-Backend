@@ -1,4 +1,4 @@
-package com.melodymatebackend.auth.jwt;
+package com.melodymatebackend.auth.jwt.utils;
 
 import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.INVALID_TOKEN;
 
@@ -44,18 +44,18 @@ public class TokenProvider {
 
 
     public String generateAccessToken(Authentication authentication) {
-        return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME);
+        return generateToken(authentication);
     }
 
     // 1. refresh token 발급
     public void generateRefreshToken(Authentication authentication, String accessToken) {
-        String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);
+        String refreshToken = generateToken(authentication);
 //        tokenService.saveOrUpdate(authentication.getName(), refreshToken, accessToken); // redis에 저장
     }
 
-    private String generateToken(Authentication authentication, long expireTime) {
+    private String generateToken(Authentication authentication) {
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + expireTime);
+        Date expiredDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
 
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
